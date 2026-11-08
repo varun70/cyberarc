@@ -4,7 +4,7 @@ An interactive, single-page guide that teaches core cybersecurity ideas visually
 
 Inspired by the Networking Protocol Explorer concept, rebuilt for security.
 
-**Live demo:** `https://<your-username>.github.io/<repo-name>/` *(replace after you deploy)*
+**Live demo:** `https://cyberarc.vanarsec.in/` *(replace after you deploy)*
 
 <!-- Add a screenshot after deploying:
 ![Cyber Security Explorer](docs/screenshot.png)
