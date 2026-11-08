@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cyber Security Explorer: learn attacks and defenses visually</title>
+<meta name="description" content="An interactive guide to 24 core cybersecurity topics. Play step-by-step attack and defense walkthroughs, compare topics, take a quiz and run incident drills.">
+<meta name="theme-color" content="#0B6A72">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cyber Security Explorer">
+<meta property="og:description" content="See how attacks work and what stops them. 24 topics, animated walkthroughs, a quiz and incident drills.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 4 7v8c0 7.5 5 13 12 15 7-2 12-7.5 12-15V7L16 2Z' fill='%230B6A72'/%3E%3Cpath d='M10.5 16.5 14.5 20.5 22 12' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EDF0F3; --surface:#FFFFFF; --ink:#13202B; --muted:#4F5E6C; --line:#CBD3DB;
+  --attack:#B8322A; --attack-soft:#F7E3E1; --defense:#0B6A72; --defense-soft:#DAEEF0;
+  --focus:#1D4ED8; --shadow:rgba(19,32,43,.14);
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E151C; --surface:#16202A; --ink:#E7EDF2; --muted:#9DABB8; --line:#2B3946;
+    --attack:#FF8378; --attack-soft:#3A201E; --defense:#58C9D1; --defense-soft:#12333A;
+    --focus:#8AB4FF; --shadow:rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E151C; --surface:#16202A; --ink:#E7EDF2; --muted:#9DABB8; --line:#2B3946;
+  --attack:#FF8378; --attack-soft:#3A201E; --defense:#58C9D1; --defense-soft:#12333A;
+  --focus:#8AB4FF; --shadow:rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1rem;line-height:1.55;-webkit-text-size-adjust:100%;}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10;}
+h1,h2,h3{font-family:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;margin:0;line-height:1.1;letter-spacing:-.015em;}
+button{font:inherit;color:inherit;cursor:pointer;}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px;}
+.wrap{width:min(1120px,100%);margin-inline:auto;padding-inline:clamp(1rem,4vw,2rem);}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;min-height:56px;gap:1rem;}
+.brand{display:flex;align-items:center;gap:.6rem;font-family:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:-.01em;}
+.brand svg{width:26px;height:26px;flex:none;}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:999px;padding:.35rem .9rem;font-size:.875rem;font-weight:500;min-height:36px;}
+.ghost:hover{border-color:var(--ink);}
+
+/* hero */
+.hero{padding:clamp(2rem,6vw,4rem) 0 1.5rem;}
+.hero h1{font-size:clamp(2.1rem,6.2vw,3.6rem);font-weight:800;max-width:17ch;}
+.hero p{max-width:56ch;color:var(--muted);margin:1rem 0 0;font-size:1.05rem;}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;margin-top:1.25rem;font-size:.875rem;color:var(--muted);}
+.legend span{display:inline-flex;align-items:center;gap:.45rem;}
+.sw{width:.8rem;height:.8rem;border-radius:3px;display:inline-block;}
+.sw.a{background:var(--attack);} .sw.d{background:var(--defense);}
+.cia-mini{display:inline-flex;gap:2px;}
+.cia-mini i{font-style:normal;font-size:.7rem;font-weight:600;width:1.15rem;height:1.15rem;display:grid;place-items:center;border-radius:3px;background:var(--ink);color:var(--bg);}
+
+/* controls */
+.controls{display:grid;gap:.9rem;padding-bottom:1rem;}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);}
+.seg button{border:0;background:transparent;padding:.5rem 1rem;font-size:.9rem;font-weight:500;min-height:40px;}
+.seg button+button{border-left:1px solid var(--line);}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);}
+.search{flex:1 1 220px;min-width:0;position:relative;}
+.search input{width:100%;min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:.5rem .9rem;font:inherit;}
+.search input::placeholder{color:var(--muted);}
+.cats{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.25rem;scrollbar-width:thin;}
+.cat{flex:none;border:1px solid var(--line);background:transparent;border-radius:999px;padding:.35rem .85rem;font-size:.85rem;min-height:36px;}
+.cat[aria-pressed="true"]{border-color:var(--ink);background:var(--surface);font-weight:600;box-shadow:inset 0 -2px 0 var(--ink);}
+.count{margin:.25rem 0 1rem;color:var(--muted);font-size:.875rem;}
+
+/* grid + cards */
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));padding-bottom:7rem;}
+.card{background:var(--surface);border:1px solid var(--line);border-top-width:5px;border-radius:12px;display:flex;flex-direction:column;}
+.card.attack{border-top-color:var(--attack);}
+.card.defense{border-top-color:var(--defense);}
+.card-main{all:unset;box-sizing:border-box;cursor:pointer;display:block;padding:1rem 1rem .5rem;flex:1;}
+.card-main:focus-visible{outline:3px solid var(--focus);outline-offset:-3px;border-radius:8px;}
+.kind{display:flex;gap:.6rem;align-items:baseline;font-size:.8rem;color:var(--muted);margin-bottom:.5rem;}
+.kind b{font-weight:600;}
+.card.attack .kind b{color:var(--attack);} .card.defense .kind b{color:var(--defense);}
+.card h2{font-size:1.3rem;font-weight:700;margin-bottom:.4rem;}
+.card p{margin:0;color:var(--muted);font-size:.93rem;}
+.card:hover{border-color:var(--ink);border-top-color:inherit;}
+.card.attack:hover{border-top-color:var(--attack);} .card.defense:hover{border-top-color:var(--defense);}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.5rem 1rem .9rem;}
+.cia{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;color:var(--muted);}
+.cia .boxes{display:inline-flex;gap:3px;}
+.cia .boxes i{font-style:normal;font-weight:600;font-size:.72rem;width:1.35rem;height:1.35rem;display:grid;place-items:center;border-radius:4px;border:1px solid var(--line);color:var(--muted);}
+.cia .boxes i.on{background:var(--ink);border-color:var(--ink);color:var(--bg);}
+.cmp-btn{border:1px solid var(--line);background:transparent;border-radius:8px;padding:.3rem .65rem;font-size:.8rem;font-weight:500;min-height:34px;}
+.cmp-btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.empty{grid-column:1/-1;padding:2rem 0;color:var(--muted);}
+.empty button{margin-top:.75rem;}
+
+/* compare tray */
+.tray{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 20px var(--shadow);padding:.75rem 0 calc(.75rem + env(safe-area-inset-bottom,0px));}
+.tray[hidden]{display:none;}
+.tray .wrap{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;}
+.tray .names{font-size:.9rem;min-width:0;}
+.tray .names small{color:var(--muted);display:block;}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:10px;padding:.5rem 1rem;font-weight:600;font-size:.9rem;min-height:40px;}
+.btn.alt{background:transparent;color:var(--ink);border-color:var(--line);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* dialogs */
+dialog{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0;border-radius:14px;width:min(760px,calc(100% - 1.25rem));max-height:calc(100dvh - 1.5rem);overflow:hidden;}
+dialog[open]{display:flex;flex-direction:column;}
+dialog::backdrop{background:rgba(8,14,20,.6);}
+.d-head{padding:1.1rem 1.25rem .8rem;border-top:6px solid var(--line);display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;}
+.d-head.attack{border-top-color:var(--attack);} .d-head.defense{border-top-color:var(--defense);}
+.d-head h2{font-size:clamp(1.5rem,5vw,2rem);font-weight:800;}
+.d-head .kind{margin-bottom:.35rem;}
+.x{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:transparent;display:grid;place-items:center;font-size:1.2rem;line-height:1;}
+.x:hover{border-color:var(--ink);}
+.tabs{display:flex;gap:.25rem;padding:0 1.25rem;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:none;border:0;background:transparent;padding:.7rem .85rem;font-size:.9rem;font-weight:500;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;min-height:44px;}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:600;}
+.panels{padding:1.1rem 1.25rem 1.5rem;overflow-y:auto;overscroll-behavior:contain;}
+.panel[hidden]{display:none;}
+.lead{margin:0 0 1rem;font-size:1.05rem;max-width:62ch;}
+.h3{font-size:1rem;font-weight:700;margin:1.2rem 0 .5rem;}
+ul.list{margin:0;padding:0;list-style:none;display:grid;gap:.55rem;max-width:64ch;}
+ul.list li{position:relative;padding-left:1.15rem;}
+ul.list li::before{content:"";position:absolute;left:0;top:.62em;width:.5rem;height:.5rem;border-radius:2px;background:var(--c,var(--ink));}
+.attack ul.list{--c:var(--attack);} .defense ul.list{--c:var(--defense);}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem;margin-top:1.25rem;}
+.meta div{border:1px solid var(--line);border-radius:10px;padding:.65rem .8rem;}
+.meta dt{font-size:.78rem;color:var(--muted);margin-bottom:.15rem;}
+.meta dd{margin:0;font-size:.92rem;font-weight:500;}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:.35rem .85rem;font-size:.88rem;font-weight:500;min-height:38px;display:inline-flex;align-items:center;gap:.45rem;}
+.chip::before{content:"";width:.6rem;height:.6rem;border-radius:2px;background:var(--c);}
+.chip.attack{--c:var(--attack);} .chip.defense{--c:var(--defense);}
+.chip:hover{border-color:var(--ink);}
+
+/* walkthrough */
+.seq{--n:3;margin:.25rem 0 0;}
+.actors{display:grid;grid-template-columns:repeat(var(--n),1fr);}
+.actor{justify-self:center;text-align:center;font-size:.82rem;font-weight:600;padding:.4rem .6rem;border-radius:8px;border:2px solid var(--c,var(--ink));max-width:96%;line-height:1.2;background:var(--surface);position:relative;z-index:1;}
+.actor.bad{--c:var(--attack);} .actor.good{--c:var(--defense);} .actor.n{--c:var(--ink);}
+.body{position:relative;padding:.25rem 0 .5rem;}
+.life{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed var(--line);transform:translateX(-1px);}
+.step{display:grid;grid-template-columns:repeat(var(--n),1fr);min-height:68px;align-items:end;padding:.35rem 0;position:relative;}
+.arrow,.note{--c:var(--ink);opacity:0;transition:opacity .3s;}
+.bad{--c:var(--attack);} .good{--c:var(--defense);}
+.arrow{position:relative;margin-inline:calc(50% / var(--span,1));}
+.lbl{display:block;text-align:center;font-size:.8rem;line-height:1.25;padding:0 .15rem .3rem;font-weight:500;}
+.lbl b,.note b{display:inline-grid;place-items:center;width:1.2rem;height:1.2rem;border-radius:50%;background:var(--c);color:var(--surface);font-size:.7rem;margin-right:.35rem;vertical-align:1px;}
+.ln{display:block;height:2px;background:var(--c);position:relative;transform:scaleX(0);transition:transform .55s ease;}
+.arrow.r .ln{transform-origin:left;} .arrow.l .ln{transform-origin:right;}
+.arrow.r .ln::after,.arrow.l .ln::before{content:"";position:absolute;top:-4px;border-top:5px solid transparent;border-bottom:5px solid transparent;}
+.arrow.r .ln::after{right:-1px;border-left:9px solid var(--c);}
+.arrow.l .ln::before{left:-1px;border-right:9px solid var(--c);}
+.note{width:max-content;max-width:min(15rem,190%);padding:.4rem .6rem;border:2px solid var(--c);border-radius:8px;background:var(--surface);font-size:.8rem;line-height:1.25;font-weight:500;position:relative;z-index:1;}
+.note.first{justify-self:start;} .note.last{justify-self:end;} .note.mid{justify-self:center;}
+.step.on .arrow,.step.on .note{opacity:1;}
+.step.on .ln{transform:scaleX(1);}
+.step.cur .lbl,.step.cur .note{font-weight:600;}
+.step:not(.cur).on .arrow,.step:not(.cur).on .note{opacity:.62;}
+.cap{margin-top:.75rem;border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;min-height:6.2rem;}
+.cap h3{font-size:1rem;font-weight:700;margin-bottom:.3rem;}
+.cap p{margin:0;font-size:.95rem;}
+.ctl{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap;}
+.ctl .btn{padding:.45rem .9rem;}
+.ref-note{font-size:.8rem;color:var(--muted);margin-top:.5rem;}
+
+/* practice */
+.prog{font-size:.85rem;color:var(--muted);margin:0 0 .5rem;}
+.qh{font-size:1.25rem;font-weight:700;margin:0 0 .75rem;max-width:40ch;}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:.7rem .9rem;margin:.5rem 0;min-height:44px;font-size:.95rem;line-height:1.4;}
+.opt:hover:not(:disabled){border-color:var(--ink);}
+.opt:disabled{cursor:default;}
+.opt.right{border-color:var(--defense);background:var(--defense-soft);}
+.opt.wrong{border-color:var(--attack);background:var(--attack-soft);}
+.fb{border:1px solid var(--line);border-radius:10px;padding:.75rem .9rem;margin:.75rem 0;font-size:.93rem;}
+.score{font-family:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;font-size:2.6rem;font-weight:800;margin:.25rem 0;}
+.scn{display:block;width:100%;text-align:left;border:1px solid var(--line);border-left:5px solid var(--attack);background:var(--surface);color:var(--ink);border-radius:10px;padding:.8rem 1rem;margin:.6rem 0;}
+.scn:hover{border-color:var(--ink);border-left-color:var(--attack);}
+.scn b{display:block;font-size:1.05rem;margin-bottom:.15rem;}
+.scn span{color:var(--muted);font-size:.9rem;}
+.alertbox{border:1px solid var(--attack);background:var(--attack-soft);border-radius:10px;padding:.7rem .9rem;margin:0 0 1rem;font-size:.93rem;}
+
+/* compare table */
+.tbl{overflow-x:auto;padding:1rem 1.25rem 1.5rem;}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.9rem;}
+th,td{text-align:left;vertical-align:top;padding:.65rem .75rem;border-bottom:1px solid var(--line);}
+th[scope="row"]{color:var(--muted);font-weight:500;width:7.5rem;}
+thead th{font-family:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;font-size:1.05rem;border-bottom:3px solid var(--c,var(--ink));}
+thead th.attack{--c:var(--attack);} thead th.defense{--c:var(--defense);}
+
+footer{border-top:1px solid var(--line);padding:1.5rem 0 7rem;color:var(--muted);font-size:.85rem;}
+footer .wrap{max-width:760px;margin-inline:0 auto;}
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:var(--bg);padding:.6rem 1rem;z-index:100;border-radius:0 0 8px 0;}
+.skip:focus{left:0;top:env(safe-area-inset-top,0px);}
+.nav{display:flex;align-items:center;gap:.75rem;}
+.navlink{color:var(--ink);text-decoration:none;font-size:.9rem;font-weight:500;padding:.5rem .25rem;}
+.navlink:hover{text-decoration:underline;text-underline-offset:3px;}
+.about{border-top:1px solid var(--line);margin-top:1rem;padding:2rem 0 1rem;}
+.about h2{font-size:clamp(1.4rem,4vw,1.9rem);font-weight:800;margin-bottom:1rem;}
+.acols{display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));}
+.acols h3{font-size:1rem;font-weight:700;margin-bottom:.35rem;}
+.acols p{margin:0;color:var(--muted);font-size:.93rem;max-width:46ch;}
+footer p{margin:.25rem 0;}
+@media print{.top,.controls,.tray,.skip,.hero .row{display:none !important;}body::before{display:none;}}
+@media (prefers-reduced-motion: reduce){
+  .arrow,.note,.ln{transition:none !important;}
+}
+@media (max-width:520px){
+  .tray .btn{flex:1;}
+  .d-head{padding-inline:1rem;} .tabs{padding-inline:1rem;} .panels{padding-inline:1rem;}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.5 5 13 12 15 7-2 12-7.500 12-15V7L16 2Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M10.500 16.500 14.500 20.500 22 12" fill="none" stroke="var(--defense)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Cyber Security Explorer
+    </div>
+    <nav class="nav" aria-label="Site">
+      <a href="#aboutsec" class="navlink">About</a>
+      <button class="ghost" id="theme" type="button" aria-label="Switch between light and dark theme">Theme</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <section class="hero" aria-labelledby="h1">
+    <h1 id="h1">See how attacks work and what stops them</h1>
+    <p>Twenty-four core cybersecurity ideas. Open any card and play its step-by-step walkthrough, compare attacks and defenses side by side, then test yourself with a quiz or an incident drill.</p>
+    <div class="row" style="margin-top:1.25rem">
+      <button class="btn" id="bQuiz" type="button">Take the quiz</button>
+      <button class="btn alt" id="bDrill" type="button">Incident drills</button>
+    </div>
+    <div class="legend" aria-label="Legend">
+      <span><i class="sw a"></i>Attack</span>
+      <span><i class="sw d"></i>Defense</span>
+      <span><span class="cia-mini" aria-hidden="true"><i>C</i><i>I</i><i>A</i></span>Confidentiality, integrity, availability</span>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="Filters">
+    <div class="row">
+      <div class="seg" role="group" aria-label="Show">
+        <button type="button" data-kind="all" aria-pressed="true">All</button>
+        <button type="button" data-kind="attack" aria-pressed="false">Attacks</button>
+        <button type="button" data-kind="defense" aria-pressed="false">Defenses</button>
+      </div>
+      <div class="search"><input id="q" type="search" placeholder="Search, e.g. login, backup, malware" aria-label="Search topics" autocomplete="off"></div>
+    </div>
+    <div class="cats" id="cats" role="group" aria-label="Category"></div>
+  </section>
+
+  <p class="count" id="count" aria-live="polite"></p>
+  <div class="grid" id="grid"></div>
+
+  <section class="about" id="aboutsec" aria-labelledby="aboutH">
+    <h2 id="aboutH">About this explorer</h2>
+    <div class="acols">
+      <div>
+        <h3>How to use it</h3>
+        <p>Pick a topic, then open the Walkthrough tab to watch the attack or defense unfold step by step. Add up to three topics to the compare tray to see them side by side. Use the quiz and incident drills to check what stuck.</p>
+      </div>
+      <div>
+        <h3>What it covers</h3>
+        <p>Twenty-four topics across people and identity, web apps, networks, endpoints and malware, and security strategy. Each topic maps to the confidentiality, integrity and availability triad and, where one exists, a public reference such as MITRE ATT&amp;CK, OWASP or NIST.</p>
+      </div>
+      <div>
+        <h3>Accuracy and limits</h3>
+        <p>Walkthroughs are simplified for learning and real incidents vary. This is not a replacement for formal training, vendor documentation or your organization’s policies. Only practice offensive techniques on systems you own or are authorized to test.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Cyber Security Explorer</strong>, an open-source learning project. Built by Varun.</p>
+    <p>Educational use only. No tracking, no cookies and no data leaves your browser. Reference names such as MITRE ATT&amp;CK, OWASP and NIST belong to their respective owners.</p>
+  </div>
+</footer>
+
+<div class="tray" id="tray" hidden>
+  <div class="wrap">
+    <div class="names" id="trayNames"></div>
+    <div class="row">
+      <button class="btn alt" id="clear" type="button">Clear</button>
+      <button class="btn" id="go" type="button" disabled>Compare</button>
+    </div>
+  </div>
+</div>
+
+<noscript><div class="wrap"><p class="alertbox">This explorer needs JavaScript to show topics, walkthroughs and the quiz. Please enable JavaScript and reload.</p></div></noscript>
+<dialog id="dlg" aria-labelledby="dTitle"></dialog>
+<dialog id="cmp" aria-labelledby="cTitle"></dialog>
+<dialog id="lab" aria-labelledby="lTitle"></dialog>
+
+<script>
+"use strict";
+var CATS=["People and identity","Web apps","Network","Endpoint and malware","Strategy and monitoring"];
+var CIA_NAMES={C:"Confidentiality",I:"Integrity",A:"Availability"};
+
+/* step format: [fromActor, toActor, short label, caption, kind]  (from === to draws a note) */
+var ITEMS=[
+{id:"phishing",kind:"attack",name:"Phishing",cat:0,
+ short:"Fake messages that trick people into handing over logins or running malware.",
+ overview:"Phishing pretends to come from someone you trust, such as a bank, a coworker or a delivery service, and pushes you to click a link, open a file or share a secret. It targets people instead of software, and it is often the first step of a bigger break-in.",
+ traits:["Creates urgency or fear, for example “your account will be locked today”","Uses lookalike domains and spoofed display names","Spear phishing aims at one person using researched details","Usually leads to a fake login page or a malware download"],
+ cia:"CI",ref:"MITRE ATT&CK T1566",
+ actors:[["Attacker","bad"],["Employee","n"],["Fake login page","bad"]],
+ steps:[[0,1,"Lure email","The attacker emails the employee, posing as IT: “Your password expires today. Sign in to keep access.”","bad"],
+        [1,2,"Clicks the link","The link opens a lookalike domain with a copied login page.","bad"],
+        [1,2,"Submits password","The employee types their username and password into the fake page.","bad"],
+        [2,0,"Credentials forwarded","The fake page passes the login details straight to the attacker.","bad"],
+        [0,0,"Signs in as the employee","With a valid password the attacker logs in and looks for email, files and VPN access.","bad"]],
+ actions:["Use phishing-resistant MFA (passkeys or security keys) so a stolen password alone fails","Filter email with link rewriting and attachment sandboxing","Give people a one-click “report phishing” button and practice with simulations","Block newly registered and lookalike domains at DNS or the web proxy"],
+ signals:["Sign-ins from unusual places or impossible travel","New inbox rules that forward or hide messages","Several people reporting the same sender or subject","Clicks on a URL that is later flagged as malicious"],
+ related:["mfa","edr","siem"]},
+
+{id:"sqli",kind:"attack",name:"SQL injection",cat:1,
+ short:"Crafted input rewrites a database query to read or change data.",
+ overview:"SQL injection happens when an application builds a database query by pasting user input into it. An attacker supplies input that changes what the query means, so the database runs commands the developer never intended, such as returning every user record.",
+ traits:["Caused by queries built from strings instead of parameters","Can bypass logins, dump tables or modify data","Blind variants infer data from true or false answers and timing","Fully preventable with parameterized queries"],
+ cia:"CI",ref:"OWASP Top 10 A03:2021 Injection",
+ actors:[["Attacker","bad"],["Web app","n"],["Database","n"]],
+ steps:[[0,1,"Crafted input","The attacker types a payload such as ' OR '1'='1 into the username field instead of a name.","bad"],
+        [1,2,"Query built from input","The app pastes the text straight into its SQL string, so the login condition becomes always true.","bad"],
+        [2,1,"Returns every row","The database does exactly what the query says and returns all users.","bad"],
+        [1,0,"Access granted","The app treats the first returned row, often an admin, as a successful login.","bad"],
+        [0,0,"Digs deeper","More payloads list tables and pull out data such as emails and password hashes.","bad"]],
+ actions:["Use parameterized queries (prepared statements) for every database call","Validate input with allow-lists and use an ORM correctly","Run the app’s database account with least privilege (no admin, no DROP)","Add a WAF as a second layer, not as the only fix"],
+ signals:["SQL syntax errors in application logs","Request parameters containing quotes, UNION or comment markers","Unusually large query results or response sizes","Bursts of server errors from one client"],
+ related:["waf","segmentation","siem"]},
+
+{id:"xss",kind:"attack",name:"Cross-site scripting (XSS)",cat:1,
+ short:"Injected script runs inside other people’s browsers.",
+ overview:"Cross-site scripting lets an attacker place JavaScript on a page that other people view. The browser trusts the site, so the script can read session data, act as the victim or change what they see.",
+ traits:["Comes in stored, reflected and DOM-based forms","Runs with the victim’s privileges on that site","Often used to steal session tokens or perform actions","Caused by output that is not encoded for where it appears"],
+ cia:"CI",ref:"OWASP Top 10 A03:2021 Injection",
+ actors:[["Attacker","bad"],["Vulnerable site","n"],["Visitor’s browser","n"]],
+ steps:[[0,1,"Posts a payload","The attacker submits a comment that contains a script tag instead of normal text.","bad"],
+        [1,1,"Stores it unescaped","The site saves the comment and later prints it into pages without encoding it.","bad"],
+        [2,1,"Opens the page","A visitor loads the page that shows the comment.","n"],
+        [1,2,"Page plus hidden script","The server sends the page with the attacker’s script inside it.","bad"],
+        [2,0,"Session data sent out","The script runs as part of the trusted page and sends the visitor’s session token to the attacker.","bad"]],
+ actions:["Encode output for its context (HTML, attribute, JavaScript, URL)","Set a strict Content-Security-Policy","Mark session cookies HttpOnly, Secure and SameSite","Sanitize rich text with a maintained library, not hand-written patterns"],
+ signals:["Unexpected script tags or event handlers in stored content","Content-Security-Policy violation reports","Browsers calling unfamiliar domains","A session reused from a new device soon after a page view"],
+ related:["waf","mfa","siem"]},
+
+{id:"ransomware",kind:"attack",name:"Ransomware",cat:3,
+ short:"Malware that locks files and demands payment to unlock them.",
+ overview:"Ransomware encrypts files, usually after the attacker has already moved through the network and copied data out. Victims are pressured to pay for a key and, increasingly, to stop the stolen data from being published.",
+ traits:["Often preceded by days or weeks of quiet access","Double extortion: encrypt files and threaten to leak them","Backups are targeted first to remove the victim’s options","Commonly starts with phishing, exposed remote desktop or unpatched VPNs"],
+ cia:"CA",ref:"MITRE ATT&CK T1486",
+ actors:[["Attacker","bad"],["Workstation","n"],["File server","n"]],
+ steps:[[0,1,"Initial foothold","The attacker gets in through a phishing attachment or an exposed remote service.","bad"],
+        [1,2,"Moves laterally","Stolen credentials open shared drives and servers.","bad"],
+        [2,0,"Data copied out","Sensitive files are uploaded for later extortion.","bad"],
+        [0,2,"Backups deleted, files locked","Backups and shadow copies are removed, then files are encrypted.","bad"],
+        [2,1,"Ransom note","Users see a note demanding payment and threatening to publish the stolen data.","bad"]],
+ actions:["Keep offline or immutable backups and test restores often (the 3-2-1 rule)","Use EDR with ransomware behavior detection and host isolation","Segment the network and limit where admin accounts can sign in","Patch internet-facing systems and close unneeded remote desktop exposure"],
+ signals:["Many files renamed or given a new extension in minutes","Commands that delete backups or shadow copies","Large unusual outbound transfers","New admin accounts or tools on file servers"],
+ related:["edr","segmentation","mfa"]},
+
+{id:"ddos",kind:"attack",name:"DDoS",cat:2,
+ short:"A flood of traffic that knocks a service offline.",
+ overview:"A distributed denial-of-service attack overwhelms a service’s bandwidth, connections or application logic using traffic from many hijacked devices at once. Nothing is stolen. The goal is to make the service unavailable.",
+ traits:["Traffic comes from botnets of compromised devices","Volumetric, protocol and application-layer variants","Hard to block by IP address because sources are numerous","Sometimes used as a smokescreen or for extortion"],
+ cia:"A",ref:"MITRE ATT&CK T1498",
+ actors:[["Attacker","bad"],["Botnet","bad"],["Target service","n"],["Customer","n"]],
+ steps:[[0,1,"Sends command","The attacker tells thousands of infected devices to start.","bad"],
+        [1,2,"Floods requests","Every device sends requests at once, far beyond normal load.","bad"],
+        [2,2,"Capacity used up","Bandwidth, connections or CPU run out.","bad"],
+        [3,2,"Request times out","A real customer cannot get through.","bad"],
+        [2,2,"Scrubbing starts","Traffic is routed through a filtering service that drops attack traffic and passes the rest.","good"]],
+ actions:["Use a CDN or DDoS scrubbing service, always-on or on demand","Rate-limit and cache at the edge","Plan headroom with autoscaling and redundant network paths","Keep a runbook with ISP and provider contacts"],
+ signals:["A sudden traffic spike from many sources","Surges of half-open connections or identical requests","Latency and error alerts across services","An odd mix of client locations"],
+ related:["waf","segmentation","siem"]},
+
+{id:"mitm",kind:"attack",name:"Man-in-the-middle",cat:2,
+ short:"An attacker secretly sits between two parties and reads or changes their traffic.",
+ overview:"In a man-in-the-middle attack the attacker gets onto the path between a user and a service, for example through rogue Wi-Fi, ARP spoofing or DNS tampering. Anything not properly protected can be watched or modified.",
+ traits:["Common on open or rogue Wi-Fi","Relies on unencrypted traffic or ignored certificate warnings","Techniques include ARP spoofing, DNS spoofing and SSL stripping","Both sides believe they are talking directly"],
+ cia:"CI",ref:"MITRE ATT&CK T1557",
+ actors:[["User","n"],["Attacker","bad"],["Website","n"]],
+ steps:[[1,1,"Rogue hotspot","The attacker creates free Wi-Fi with a trusted-looking name.","bad"],
+        [0,1,"Connects and browses","The user’s traffic now passes through the attacker’s device.","bad"],
+        [1,2,"Relays the request","The attacker forwards it, so everything seems to work.","bad"],
+        [2,1,"Response comes back","The website answers the attacker, thinking it is the user.","n"],
+        [1,0,"Altered response","Without valid TLS the attacker can read or change the data. With TLS, the browser shows a certificate warning instead.","bad"]],
+ actions:["Enforce HTTPS everywhere and turn on HSTS","Use a VPN or Zero Trust access on untrusted networks","Never click through certificate warnings","Enable dynamic ARP inspection and DHCP snooping on switches"],
+ signals:["ARP table changes or duplicate IP-to-MAC mappings","Certificate mismatches or unexpected issuers","Rogue access points found by wireless monitoring","DNS answers that differ from trusted resolvers"],
+ related:["tls","zerotrust","segmentation"]},
+
+{id:"credstuff",kind:"attack",name:"Credential stuffing",cat:0,
+ short:"Stolen username and password pairs replayed against other sites.",
+ overview:"Many people reuse passwords, so logins leaked in one breach often work somewhere else. Attackers automate millions of attempts across services and keep the accounts that open.",
+ traits:["Uses real leaked credentials, not guesses","Automated with bots and rotating proxies","Low success rate but huge volume","Hits personal and work accounts alike"],
+ cia:"C",ref:"MITRE ATT&CK T1110.004",
+ actors:[["Attacker","bad"],["Login page","n"],["User account","n"]],
+ steps:[[0,0,"Gets a breach list","The attacker obtains emails and passwords from an old breach.","bad"],
+        [0,1,"Automated attempts","Bots try each pair, rotating IP addresses to avoid blocks.","bad"],
+        [1,0,"Some succeed","Where someone reused a password, the login works.","bad"],
+        [0,2,"Takes over","The attacker changes recovery details, drains stored value or sells access.","bad"],
+        [1,0,"Blocked by MFA","With MFA and bot detection, a correct password alone is not enough.","good"]],
+ actions:["Require MFA, ideally passkeys","Use a password manager so every site has a unique password","Rate-limit logins, add bot detection and check passwords against breach lists","Alert users about sign-ins from new devices"],
+ signals:["High login failure rates across many usernames","Many accounts targeted from the same IPs or user agents","Successful logins from IPs with no history","Spikes in password resets"],
+ related:["mfa","waf","siem"]},
+
+{id:"supplychain",kind:"attack",name:"Supply chain attack",cat:4,
+ short:"Compromising a trusted vendor or dependency to reach its customers.",
+ overview:"Instead of attacking a target directly, the attacker tampers with something the target already trusts: a software update, an open-source package or a service provider. The malicious code arrives through a normal, trusted channel.",
+ traits:["Abuses trust in vendors and dependencies","One compromise can reach thousands of organizations","Examples: poisoned updates and malicious packages","Slow to spot because the code looks legitimate"],
+ cia:"CI",ref:"MITRE ATT&CK T1195",
+ actors:[["Attacker","bad"],["Vendor or package","n"],["Customer","n"]],
+ steps:[[0,1,"Breaches the build","The attacker gets into the vendor’s build system or a package maintainer’s account.","bad"],
+        [1,1,"Signs bad code","The vendor builds and signs the update without knowing it has been altered.","bad"],
+        [1,2,"Ships the update","Customers install it through their normal update process.","n"],
+        [2,0,"Backdoor calls home","The hidden code contacts the attacker’s server.","bad"],
+        [0,2,"Picks targets","The attacker chooses high-value customers for follow-on access.","bad"]],
+ actions:["Keep a software bill of materials (SBOM) and pin dependency versions","Verify signatures and use isolated or reproducible builds","Review vendor access and security practices","Watch outbound traffic for unexpected callbacks"],
+ signals:["New outbound connections from trusted software","Changed dependency versions or hashes","Build pipeline activity from unusual places","Vendor security advisories"],
+ related:["edr","segmentation","siem"]},
+
+{id:"zeroday",kind:"attack",name:"Zero-day exploit",cat:3,
+ short:"An attack on a flaw the vendor does not know about yet.",
+ overview:"A zero-day is a vulnerability with no patch, because defenders have had zero days to fix it. Exploits for these flaws are valuable and can slip past tools that look only for known signatures.",
+ traits:["No patch exists when attacks begin","Signature-based tools often miss them","Used first by targeted attackers, later by criminals once public","Risk drops sharply after disclosure and patching, so speed matters"],
+ cia:"CIA",ref:"MITRE ATT&CK T1203",
+ actors:[["Attacker","bad"],["Vulnerable software","n"],["Vendor","n"]],
+ steps:[[0,1,"Finds a flaw","The attacker discovers an unknown bug and writes an exploit for it.","bad"],
+        [0,1,"Exploits quietly","With no patch and no signature, early attacks go unnoticed.","bad"],
+        [1,2,"Incident reported","A defender or researcher notices odd behavior and tells the vendor.","n"],
+        [2,1,"Patch released","The vendor ships a fix and a security advisory.","good"],
+        [1,1,"Customers patch","The window closes as organizations apply the update. Copycat attacks often rise briefly after disclosure.","good"]],
+ actions:["Patch fast, starting with internet-facing and actively exploited flaws","Use EDR behavior detection, not signatures alone","Shrink the attack surface by disabling unused services","Apply virtual patching with a WAF or IPS while waiting for the vendor fix"],
+ signals:["Crashes or unexpected processes launched by common apps","Strange memory or child-process behavior","Vendor and threat-intelligence advisories about active exploitation","Odd outbound connections from servers"],
+ related:["edr","waf","segmentation"]},
+
+{id:"mfa",kind:"defense",name:"Multi-factor authentication",cat:0,
+ short:"Requires a second proof of identity beyond a password.",
+ overview:"MFA asks for two or more independent factors: something you know, have or are. If a password is stolen, the attacker still needs the second factor. Strength varies a lot. Passkeys and security keys resist phishing, while SMS codes and push approvals can be intercepted or abused.",
+ traits:["Factors: knowledge, possession and inherence","Phishing-resistant options: FIDO2 security keys and passkeys","Weaker options: SMS codes and one-tap push prompts","Start with email, VPN, admin and remote access"],
+ cia:"C",ref:"NIST SP 800-63B",
+ actors:[["User","n"],["Login service","n"],["Authenticator","good"]],
+ steps:[[0,1,"Enters password","The user signs in with their password.","n"],
+        [1,0,"Second factor required","The password alone is not accepted. The service asks for more proof.","good"],
+        [0,2,"Unlocks the device","The user approves with a fingerprint, face or PIN on their key or phone.","good"],
+        [2,1,"Signed response","The device signs a challenge tied to the real site’s domain, so a fake site cannot reuse it.","good"],
+        [1,0,"Access granted","Only now does the service let the user in.","good"]],
+ actions:["Prefer passkeys or FIDO2 keys for admins and high-risk users","Use number matching or disable plain push approvals to limit prompt fatigue","Protect recovery paths, since help-desk resets are a favorite target","Add conditional access based on device health, location and risk"],
+ signals:["SMS and push prompts can be phished or spammed","Attackers can steal already-authenticated session cookies","Weak recovery processes bypass MFA","Legacy protocols may skip MFA entirely"],
+ related:["phishing","credstuff","xss"]},
+
+{id:"waf",kind:"defense",name:"Firewall and WAF",cat:1,
+ short:"Filters traffic by rules, at the network edge or in front of web apps.",
+ overview:"A network firewall allows or blocks traffic by address, port and protocol. A web application firewall (WAF) goes further and inspects HTTP requests for attack patterns such as injection and cross-site scripting. Both reduce exposure, but neither replaces secure code and patching.",
+ traits:["Network firewalls apply stateful rules on IP, port and protocol","Next-generation firewalls add application awareness and intrusion prevention","WAFs inspect HTTP requests and responses","Default-deny is the safest rule posture"],
+ cia:"CIA",ref:"NIST SP 800-41",
+ actors:[["Attacker","bad"],["Visitor","n"],["Firewall / WAF","good"],["Web app","n"]],
+ steps:[[1,2,"Normal request","A visitor requests a page.","n"],
+        [2,3,"Allowed","No rule matches, so the request is forwarded to the app.","good"],
+        [0,2,"Malicious request","An attacker sends input containing an injection pattern.","bad"],
+        [2,2,"Blocked and logged","A rule matches. The request is dropped and the event is logged.","good"],
+        [2,0,"403 Forbidden","The attacker gets a refusal and never reaches the app.","good"]],
+ actions:["Start in monitor mode, then tune rules before blocking","Default-deny inbound traffic and review rules regularly","Keep rule sets and firmware up to date","Send logs to your SIEM"],
+ signals:["Obfuscated payloads can slip past rules","Cannot fix insecure application logic","Bad rules cause false positives or gaps","Encrypted traffic must be decrypted at the WAF to be inspected"],
+ related:["sqli","xss","ddos"]},
+
+{id:"edr",kind:"defense",name:"EDR",cat:3,
+ short:"Watches devices for suspicious behavior and lets teams respond remotely.",
+ overview:"Endpoint detection and response agents record process, file, network and registry activity on laptops and servers. Analytics and threat intelligence flag malicious behavior, and responders can isolate a device, stop a process or review the timeline remotely.",
+ traits:["Detects behavior, not just known file signatures","Continuous telemetry for threat hunting and forensics","Response actions: isolate host, kill process, collect files","Often extended to XDR with identity, email and cloud data"],
+ cia:"CIA",ref:"",
+ actors:[["Endpoint","n"],["EDR cloud","good"],["Analyst","n"]],
+ steps:[[0,1,"Streams telemetry","The agent sends process, file and network events.","n"],
+        [1,1,"Flags the pattern","An Office app launching a script that downloads a file matches known attacker behavior.","good"],
+        [1,2,"Alert raised","The analyst gets the alert with the full process tree.","good"],
+        [2,0,"Isolates the host","One click cuts the device off from the network while keeping a line to the console.","good"],
+        [2,2,"Investigates and cleans up","The analyst finds the cause, removes the threat and restores the device.","good"]],
+ actions:["Deploy to every endpoint, including servers, and monitor agent health","Tune detections and exclusions carefully","Pair alerts with a written response playbook","Integrate with your SIEM and ticketing to track cases"],
+ signals:["Only sees devices where the agent is installed","Attackers may try to disable agents (tamper protection helps)","Needs staff or a managed service to triage alerts","Unmanaged and IoT devices stay blind spots"],
+ related:["ransomware","zeroday","phishing"]},
+
+{id:"siem",kind:"defense",name:"SIEM",cat:4,
+ short:"Collects logs from everywhere and turns them into correlated alerts.",
+ overview:"A security information and event management platform gathers logs from firewalls, servers, identity systems and cloud services, standardizes them and applies correlation rules or analytics. Analysts can then spot attacks that no single log reveals.",
+ traits:["Central collection and normalization of logs","Correlation rules and analytics","Retention for investigations and compliance","Value depends on log quality and tuning"],
+ cia:"CIA",ref:"NIST SP 800-92 (log management)",
+ actors:[["Log sources","n"],["SIEM","good"],["Analyst","n"]],
+ steps:[[0,1,"Ship logs","Firewall, VPN, identity and endpoint logs flow in.","n"],
+        [1,1,"Normalize and enrich","Fields are standardized and enriched with asset, user and threat-intelligence context.","good"],
+        [1,1,"Rule fires","For example: 40 failed logins followed by a success from a new country within 10 minutes.","good"],
+        [1,2,"Prioritized alert","The analyst gets one alert with the related events attached.","good"],
+        [2,0,"Investigates and contains","The analyst pivots across logs, disables the account and blocks the source IP.","good"]],
+ actions:["Prioritize high-value sources: identity, email, endpoint, firewall and cloud","Map detections to MITRE ATT&CK and review coverage","Tune noisy rules and track the false-positive rate","Test detections with simulated attacks"],
+ signals:["Missing logs mean blind spots","Untuned rules cause alert fatigue","Detects after the fact; it does not prevent","Storage and licensing costs grow with volume"],
+ related:["phishing","credstuff","sqli","ransomware"]},
+
+{id:"zerotrust",kind:"defense",name:"Zero Trust",cat:4,
+ short:"Never trust by network location. Verify every request.",
+ overview:"Zero Trust drops the idea of a trusted internal network. Each access request is judged using identity, device health and context, granted the minimum access needed, and re-checked while the session lasts.",
+ traits:["Verify explicitly: identity, device, location and risk","Least privilege and just-in-time access","Assume breach: limit the blast radius and log everything","Applies to users, devices, apps and workloads"],
+ cia:"CI",ref:"NIST SP 800-207",
+ actors:[["User","n"],["Policy engine","good"],["Application","n"]],
+ steps:[[0,1,"Requests access","The user asks to open an app.","n"],
+        [1,1,"Checks context","Identity, device compliance, location and risk score are evaluated.","good"],
+        [1,2,"Grants narrow access","Access is limited to this app for this session, not the whole network.","good"],
+        [0,2,"Uses the app","The user works inside the allowed boundary.","n"],
+        [1,1,"Keeps re-checking","If the device falls out of compliance or behavior looks risky, the session is revoked.","good"]],
+ actions:["Start with strong identity and MFA, then add device posture","Inventory apps and data, then replace broad VPN access with per-app access","Write least-privilege policies and review them on a schedule","Log and monitor every access decision"],
+ signals:["It is a strategy, not a single product","Takes years in legacy environments","A poor asset inventory weakens policy accuracy","Too much friction pushes users toward workarounds"],
+ related:["mitm","ransomware","credstuff"]},
+
+{id:"tls",kind:"defense",name:"TLS encryption (HTTPS)",cat:2,
+ short:"Encrypts data in transit and proves who you are talking to.",
+ overview:"TLS gives a connection confidentiality, integrity and server authentication. After a handshake in which the browser checks the server’s certificate and both sides agree on keys, traffic is encrypted so on-path attackers cannot read or alter it.",
+ traits:["Certificates tie a domain to a public key through a trusted authority","TLS 1.3 is faster and removes weak legacy options","HSTS tells browsers to always use HTTPS","Protects data in transit only, not at rest or on a compromised device"],
+ cia:"CI",ref:"RFC 8446 (TLS 1.3)",
+ actors:[["Browser","n"],["Server","n"]],
+ steps:[[0,1,"ClientHello","The browser lists the versions and ciphers it supports and sends a key share.","n"],
+        [1,0,"Certificate and key share","The server presents its certificate and its own key share.","good"],
+        [0,0,"Verifies the certificate","The browser checks the chain of trust, the domain name and the dates. If anything fails, it warns the user.","good"],
+        [0,1,"Finished","Both sides now derive the same session keys without ever sending them.","good"],
+        [1,0,"Encrypted data","Application data flows protected against eavesdropping and tampering.","good"]],
+ actions:["Allow TLS 1.2 at minimum and prefer 1.3","Automate certificate renewal","Turn on HSTS","Disable weak ciphers and watch certificate expiry"],
+ signals:["Does not defend a compromised endpoint or server","Phishing sites can also have valid certificates","Expired certificates train users to ignore warnings","Inspection tools need careful TLS termination"],
+ related:["mitm","zerotrust"]},
+
+{id:"segmentation",kind:"defense",name:"Network segmentation",cat:2,
+ short:"Splits the network into zones so a breach cannot spread freely.",
+ overview:"Segmentation divides a network into zones, for example user devices, servers, lab or OT systems and guests, and controls traffic between them with firewalls or VLAN rules. If one zone is compromised, the attacker faces more barriers.",
+ traits:["VLANs, subnets and firewall rules enforce the boundaries","Micro-segmentation applies the idea per workload","Limits lateral movement and ransomware spread","Needs clear traffic maps so applications keep working"],
+ cia:"CIA",ref:"",
+ actors:[["Compromised PC","bad"],["Zone firewall","good"],["Server zone","n"]],
+ steps:[[0,1,"Tries to reach servers","Malware scans for file shares and admin ports.","bad"],
+        [1,1,"Checks zone policy","Only the needed ports from approved sources are allowed.","good"],
+        [1,0,"Blocked and logged","Admin and file-sharing traffic from user devices is denied.","good"],
+        [0,2,"Approved app port only","The one permitted application path still works for normal use.","n"],
+        [1,1,"Alert raised","Denied attempts create alerts, giving defenders early warning.","good"]],
+ actions:["Map traffic flows first, then write allow-list rules","Separate user, server, management, guest and lab zones","Block admin protocols (RDP, SMB, SSH) between user segments","Log denied traffic and review it"],
+ signals:["Rules drift and grow complex without review","Does not stop attacks that use allowed paths","Flat legacy networks are hard to retrofit","Without monitoring it only delays attackers"],
+ related:["ransomware","supplychain","ddos"]},
+
+{id:"insider",kind:"attack",name:"Insider threat",cat:0,
+ short:"Someone with legitimate access misuses it, on purpose or by mistake.",
+ overview:"Insiders such as employees, contractors and partners already hold valid access, so their actions look normal to many tools. Harm can be deliberate (data theft, sabotage) or accidental (a misdirected email, a lost laptop).",
+ traits:["Uses valid accounts, so perimeter defenses do not help","Motives include money, grievance and carelessness","Warning signs are behavioral: unusual hours, volume or destinations","Risk rises around resignations and role changes"],
+ cia:"CI",ref:"",
+ actors:[["Insider","bad"],["Data store","n"],["Monitoring","good"]],
+ steps:[[0,1,"Normal access","The insider has a valid reason to open project files every day.","n"],
+        [0,1,"Bulk download","Shortly before leaving, they copy far more files than usual to a personal device.","bad"],
+        [1,2,"Access logged","The data store records who opened what, when and how much.","good"],
+        [2,2,"Anomaly flagged","Volume and timing differ sharply from the person’s own baseline, so an alert fires.","good"],
+        [2,0,"Access restricted","Security and HR review the activity and limit the account while they investigate.","good"]],
+ actions:["Apply least privilege and review access when roles change","Use DLP and user-behavior analytics on sensitive data","Run a clear off-boarding process that removes access promptly","Train staff on safe handling so accidents are rarer"],
+ signals:["Large downloads or transfers outside normal patterns","Access to data unrelated to the person’s job","Use of personal cloud storage or removable media","Activity at unusual hours or right before departure"],
+ related:["dlp","zerotrust","siem"]},
+
+{id:"privesc",kind:"attack",name:"Privilege escalation",cat:3,
+ short:"Turning a low-level foothold into admin or root control.",
+ overview:"After getting in with limited rights, attackers look for ways to gain higher permissions: unpatched flaws, weak service configurations, stored credentials or over-privileged accounts. Admin rights let them disable defenses and reach everything else.",
+ traits:["Vertical escalation gains higher rights; horizontal reaches other users’ data","Common paths: unpatched kernels, misconfigured services, reused local admin passwords","Usually a middle step between first access and the real goal","Cloud variants abuse over-permissive roles"],
+ cia:"CIA",ref:"MITRE ATT&CK TA0004",
+ actors:[["Attacker","bad"],["Standard account","n"],["Operating system","n"]],
+ steps:[[0,1,"Gains a foothold","The attacker lands on a machine as an ordinary user.","bad"],
+        [1,2,"Looks for weaknesses","They check patch level, services and saved credentials for anything exploitable.","bad"],
+        [1,2,"Exploits a flaw","An unpatched bug or weak service setting lets their code run with higher rights.","bad"],
+        [2,0,"Admin access","The attacker now controls the system and can turn off security tools.","bad"],
+        [0,0,"Spreads","They dump credentials and move to other systems.","bad"]],
+ actions:["Patch operating systems and services quickly","Remove local admin rights from daily-use accounts","Use unique, managed local admin passwords","Review service and cloud role permissions regularly"],
+ signals:["New admin accounts or group membership changes","Security tools stopped or tampered with","Unexpected processes running as system or root","Credential-dumping behavior reported by EDR"],
+ related:["patch","edr","zerotrust"]},
+
+{id:"dnsspoof",kind:"attack",name:"DNS spoofing",cat:2,
+ short:"Forged DNS answers send people to the wrong server.",
+ overview:"DNS turns names into IP addresses. If an attacker feeds a resolver a forged answer, or tampers with a user’s DNS settings, a real name like your bank’s site can lead to the attacker’s server instead.",
+ traits:["Also called DNS cache poisoning when it targets a resolver","Classic DNS is not authenticated or encrypted","Users see the right name but reach the wrong server","Often paired with a fake site to harvest logins"],
+ cia:"CI",ref:"",
+ actors:[["User","n"],["DNS resolver","n"],["Attacker","bad"],["Fake site","bad"]],
+ steps:[[0,1,"Asks for an address","The user’s device asks the resolver where the bank’s site lives.","n"],
+        [2,1,"Forged answer","The attacker gets a fake reply accepted first, pointing to their own server.","bad"],
+        [1,0,"Wrong address returned","The resolver passes the poisoned answer to the user.","bad"],
+        [0,3,"Connects","The browser connects to the attacker’s copy of the site.","bad"],
+        [3,2,"Captures login","Anything typed into the fake site goes to the attacker. A valid TLS certificate check would normally expose the trick.","bad"]],
+ actions:["Use DNSSEC-validating resolvers where available","Use encrypted DNS (DoH or DoT) to trusted resolvers","Keep resolver software patched and restrict who can query it","Rely on HTTPS so a fake site fails certificate checks"],
+ signals:["DNS answers that differ between resolvers","Certificate warnings on well-known sites","Unexpected changes to router or device DNS settings","Sudden spikes of lookups for one domain"],
+ related:["tls","zerotrust","siem"]},
+
+{id:"cloudmisconfig",kind:"attack",name:"Cloud misconfiguration",cat:4,
+ short:"Open storage or over-broad permissions expose cloud data.",
+ overview:"Most cloud breaches come from settings, not exotic exploits: a public storage bucket, an access key committed to code, or a role that can do far more than it needs. Attackers scan the internet constantly for these mistakes.",
+ traits:["Public buckets and databases are found by automated scanners","Leaked access keys and tokens are a common entry point","Over-permissive roles widen the damage","Fast-changing environments make drift easy"],
+ cia:"CI",ref:"",
+ actors:[["Attacker","bad"],["Cloud storage","n"],["Posture tool","good"]],
+ steps:[[2,1,"Scans settings","A posture tool checks storage, roles and network rules against policy.","good"],
+        [0,1,"Scans the internet","Meanwhile the attacker’s scanner looks for storage that anyone can read.","bad"],
+        [1,0,"Data exposed","A bucket left public returns its file list and contents.","bad"],
+        [2,2,"Finding raised","The tool flags the public bucket as high risk.","good"],
+        [2,1,"Fixed","Public access is blocked and the exposure window is reviewed in the logs.","good"]],
+ actions:["Block public access by default and enforce it with policy","Use short-lived credentials and scan code for secrets","Apply least-privilege roles and review them often","Use cloud posture management and alert on drift"],
+ signals:["Storage or databases reachable from the internet","Access keys used from new locations","Sudden growth in data egress","Policy or permission changes outside change windows"],
+ related:["siem","zerotrust","dlp"]},
+
+{id:"backups",kind:"defense",name:"Backups (3-2-1)",cat:3,
+ short:"Keep tested copies of data where attackers cannot reach them.",
+ overview:"The 3-2-1 rule means three copies of data, on two kinds of media, with one copy offsite. Add an offline or immutable copy and regular restore tests, and ransomware or accidental deletion becomes a recovery task instead of a disaster.",
+ traits:["3 copies, 2 media types, 1 offsite","Immutable or offline copies cannot be encrypted by malware","A backup that was never restored is only a hope","Recovery time and recovery point goals shape the design"],
+ cia:"A",ref:"",
+ actors:[["Server","n"],["Backup system","good"],["Admin","n"]],
+ steps:[[0,1,"Scheduled backup","Data is copied on a schedule, with versions kept.","good"],
+        [1,1,"Immutable copy","One copy is locked so it cannot be changed or deleted for a set period.","good"],
+        [2,1,"Test restore","The admin regularly restores a sample to prove it works.","good"],
+        [0,0,"Incident hits","Ransomware encrypts the server’s files.","bad"],
+        [1,0,"Clean restore","After the threat is removed, data comes back from the untouched copy.","good"]],
+ actions:["Keep at least one offline or immutable copy","Protect backup credentials separately from normal admin accounts","Test full restores on a schedule and time them","Back up configuration and identity systems, not just files"],
+ signals:["Backups stored on the same network share as production can be encrypted too","Untested restores often fail in a real incident","Long recovery times can still mean downtime","Restoring without removing the attacker brings the problem back"],
+ related:["ransomware","insider"]},
+
+{id:"patch",kind:"defense",name:"Patch management",cat:3,
+ short:"Find, prioritize and fix known software flaws quickly.",
+ overview:"Most attacks use flaws that already have fixes. Patch management keeps an inventory of systems, tracks new vulnerabilities and applies updates in priority order, starting with internet-facing systems and flaws known to be exploited.",
+ traits:["Needs an accurate asset inventory","Prioritize by exposure and active exploitation, not score alone","Test, deploy, verify and report","Includes firmware, apps and third-party libraries"],
+ cia:"CIA",ref:"NIST SP 800-40",
+ actors:[["Vendor","n"],["Security team","good"],["Systems","n"]],
+ steps:[[0,1,"Advisory published","The vendor announces a flaw and a fix.","n"],
+        [1,1,"Prioritizes","The team checks which systems are affected and whether attacks are already happening.","good"],
+        [1,2,"Tests and deploys","The patch goes to a test group first, then out in waves.","good"],
+        [2,1,"Reports status","Systems report back which ones updated.","good"],
+        [1,1,"Handles exceptions","Systems that cannot update get compensating controls such as isolation.","good"]],
+ actions:["Maintain an inventory of every system and its software","Set fix-by timelines by risk level","Automate where safe and verify with scans","Isolate or virtually patch what cannot be updated"],
+ signals:["Unknown or unmanaged devices are never patched","Patches can break applications without testing","Does not help against flaws with no fix yet","Long delays leave known holes open"],
+ related:["zeroday","privesc","ransomware"]},
+
+{id:"ir",kind:"defense",name:"Incident response",cat:4,
+ short:"A rehearsed plan for handling an attack from alert to lessons learned.",
+ overview:"Incident response is the process of preparing for, detecting, containing and recovering from security events. A clear plan, named roles and practice turn a chaotic day into a controlled one.",
+ traits:["Phases: prepare, detect and analyze, contain, eradicate and recover, learn","Clear roles, contacts and decision rights","Evidence is preserved for investigation","Exercises find gaps before real attackers do"],
+ cia:"CIA",ref:"NIST SP 800-61",
+ actors:[["Alert","n"],["Response team","good"],["Affected systems","n"]],
+ steps:[[0,1,"Alert received","Monitoring raises an alert and the on-call responder takes it.","n"],
+        [1,1,"Triage","The team confirms it is real, rates severity and opens an incident record.","good"],
+        [1,2,"Contain","Affected accounts and devices are isolated to stop the spread.","good"],
+        [1,2,"Eradicate and recover","The cause is removed, systems are rebuilt or restored and monitored closely.","good"],
+        [1,1,"Lessons learned","A blameless review updates controls, detections and the plan.","good"]],
+ actions:["Write and rehearse a plan with named roles and contact lists","Pre-approve containment actions such as isolating a host","Keep logs and evidence safe for later analysis","Run tabletop exercises and update the plan afterward"],
+ signals:["A plan nobody has practiced fails under pressure","Missing logs slow or block investigation","Unclear authority delays containment","Skipping the review means repeating mistakes"],
+ related:["ransomware","phishing","insider"]},
+
+{id:"dlp",kind:"defense",name:"Data loss prevention",cat:4,
+ short:"Detects and blocks sensitive data leaving where it should not.",
+ overview:"DLP tools classify sensitive data such as personal records, source code or designs, and watch email, web uploads, cloud apps, USB and endpoints. Policies can warn, block or encrypt when data heads somewhere unapproved.",
+ traits:["Works on email, endpoint, network and cloud channels","Relies on good data classification and labels","Start in monitor mode to learn normal flows","Pairs well with user education and clear policies"],
+ cia:"C",ref:"",
+ actors:[["User","n"],["DLP policy","good"],["External destination","bad"]],
+ steps:[[0,1,"Tries to send a file","A user attaches a labeled confidential file to a personal email.","n"],
+        [1,1,"Inspects content","The policy sees the label and sensitive patterns in the file.","good"],
+        [1,0,"Warns and blocks","The user gets a clear message explaining why and what to do instead.","good"],
+        [1,1,"Event logged","The attempt is recorded for the security team.","good"],
+        [0,1,"Uses the approved way","The user shares through the approved, tracked sharing tool.","good"]],
+ actions:["Classify data first, then write policies around labels","Start in audit mode and tune before blocking","Explain blocks to users in plain language","Send alerts to your SIEM for review"],
+ signals:["Encrypted or renamed files can evade simple rules","False positives frustrate users if not tuned","Does not cover unmanaged devices and personal apps","Only as good as the data labels behind it"],
+ related:["insider","cloudmisconfig","phishing"]}
+];
+
+var BY={}; ITEMS.forEach(function(i){BY[i.id]=i;});
+var state={kind:"all",cat:-1,q:"",cmp:[]};
+var $=function(s,r){return (r||document).querySelector(s);};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function ciaWords(c){return c.split("").map(function(k){return CIA_NAMES[k];}).join(", ");}
+function ciaBoxes(it){
+  return "<span class=\"boxes\" role=\"img\" aria-label=\""+(it.kind==="attack"?"Targets: ":"Protects: ")+ciaWords(it.cia)+"\">"+
+    ["C","I","A"].map(function(k){return "<i class=\""+(it.cia.indexOf(k)>-1?"on":"")+"\">"+k+"</i>";}).join("")+"</span>";
+}
+
+/* ---------- grid ---------- */
+function matches(it){
+  if(state.kind!=="all"&&it.kind!==state.kind) return false;
+  if(state.cat>=0&&it.cat!==state.cat) return false;
+  if(state.q){
+    var hay=(it.name+" "+it.short+" "+it.overview+" "+it.traits.join(" ")+" "+CATS[it.cat]).toLowerCase();
+    var words=state.q.toLowerCase().split(/\s+/).filter(Boolean);
+    for(var i=0;i<words.length;i++){ if(hay.indexOf(words[i])<0) return false; }
+  }
+  return true;
+}
+function renderGrid(){
+  var list=ITEMS.filter(matches);
+  $("#count").textContent=list.length+(list.length===1?" topic":" topics");
+  if(!list.length){
+    $("#grid").innerHTML="<div class=\"empty\">Nothing matches those filters. Try a different keyword or clear the filters.<br><button class=\"btn alt\" type=\"button\" id=\"reset\">Clear filters</button></div>";
+    $("#reset").onclick=function(){state.kind="all";state.cat=-1;state.q="";$("#q").value="";syncControls();renderGrid();};
+    return;
+  }
+  $("#grid").innerHTML=list.map(function(it){
+    var on=state.cmp.indexOf(it.id)>-1;
+    return "<article class=\"card "+it.kind+"\">"+
+      "<button type=\"button\" class=\"card-main\" data-open=\""+it.id+"\" aria-label=\"Open "+esc(it.name)+"\">"+
+      "<div class=\"kind\"><b>"+(it.kind==="attack"?"Attack":"Defense")+"</b><span>"+esc(CATS[it.cat])+"</span></div>"+
+      "<h2>"+esc(it.name)+"</h2><p>"+esc(it.short)+"</p></button>"+
+      "<div class=\"foot\"><span class=\"cia\">"+(it.kind==="attack"?"Targets":"Protects")+ciaBoxes(it)+"</span>"+
+      "<button type=\"button\" class=\"cmp-btn\" data-cmp=\""+it.id+"\" aria-pressed=\""+on+"\">"+(on?"Added":"Compare")+"</button></div></article>";
+  }).join("");
+}
+function renderCats(){
+  var h="<button type=\"button\" class=\"cat\" data-cat=\"-1\" aria-pressed=\"true\">All categories</button>";
+  CATS.forEach(function(c,i){h+="<button type=\"button\" class=\"cat\" data-cat=\""+i+"\" aria-pressed=\"false\">"+esc(c)+"</button>";});
+  $("#cats").innerHTML=h;
+}
+function syncControls(){
+  $$(".seg button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.kind===state.kind));});
+  $$(".cat").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.cat===state.cat));});
+}
+
+/* ---------- compare tray ---------- */
+function renderTray(){
+  var n=state.cmp.length;
+  $("#tray").hidden=n===0;
+  $("#trayNames").innerHTML=n?"<strong>"+state.cmp.map(function(id){return esc(BY[id].name);}).join(", ")+"</strong><small>"+(n<2?"Pick one more to compare":"Up to 3 topics")+"</small>":"";
+  $("#go").disabled=n<2;
+}
+function toggleCmp(id){
+  var i=state.cmp.indexOf(id);
+  if(i>-1) state.cmp.splice(i,1);
+  else{ if(state.cmp.length>=3) state.cmp.shift(); state.cmp.push(id); }
+  renderTray(); renderGrid();
+}
+function openCompare(){
+  var items=state.cmp.map(function(id){return BY[id];});
+  var rows=[
+    ["Type",function(i){return i.kind==="attack"?"Attack":"Defense";}],
+    ["Category",function(i){return CATS[i.cat];}],
+    [null,function(i){return (i.kind==="attack"?"Targets: ":"Protects: ")+ciaWords(i.cia);}],
+    ["In one line",function(i){return i.short;}],
+    ["Key trait",function(i){return i.traits[0];}],
+    ["Best first step",function(i){return i.actions[0];}],
+    ["Reference",function(i){return i.ref||"None listed";}]
+  ];
+  var h="<div class=\"d-head\"><div><h2 id=\"cTitle\">Compare</h2></div><button class=\"x\" type=\"button\" aria-label=\"Close\" data-close=\"cmp\">&times;</button></div><div class=\"tbl\"><table><thead><tr><td></td>"+
+    items.map(function(i){return "<th class=\""+i.kind+"\" scope=\"col\">"+esc(i.name)+"</th>";}).join("")+"</tr></thead><tbody>";
+  rows.forEach(function(r){
+    h+="<tr><th scope=\"row\">"+(r[0]||"Impact")+"</th>"+items.map(function(i){return "<td>"+esc(r[1](i))+"</td>";}).join("")+"</tr>";
+  });
+  h+="</tbody></table></div>";
+  var d=$("#cmp"); d.innerHTML=h; if(!d.open) d.showModal();
+}
+
+/* ---------- detail dialog ---------- */
+var timer=null,cur=0,openId=null;
+function stopTimer(){ if(timer){clearInterval(timer);timer=null;} }
+function seqHTML(it){
+  var n=it.actors.length;
+  var actors=it.actors.map(function(a){return "<div class=\"actor "+a[1]+"\">"+esc(a[0])+"</div>";}).join("");
+  var lines=it.actors.map(function(_,i){return "<i class=\"life\" style=\"left:"+((i+0.5)/n*100)+"%\"></i>";}).join("");
+  var rows=it.steps.map(function(s,i){
+    var f=s[0],t=s[1],label=s[2],k=s[4];
+    if(f===t){
+      var pos=f===0?"first":(f===n-1?"last":"mid");
+      return "<div class=\"step\" data-i=\""+i+"\"><div class=\"note "+pos+" "+k+"\" style=\"grid-column:"+(f+1)+"\"><b>"+(i+1)+"</b>"+esc(label)+"</div></div>";
+    }
+    var lo=Math.min(f,t),span=Math.abs(f-t)+1,dir=t>f?"r":"l";
+    return "<div class=\"step\" data-i=\""+i+"\"><div class=\"arrow "+dir+" "+k+"\" style=\"grid-column:"+(lo+1)+" / span "+span+";--span:"+span+"\"><span class=\"lbl\"><b>"+(i+1)+"</b>"+esc(label)+"</span><span class=\"ln\"></span></div></div>";
+  }).join("");
+  return "<div class=\"seq\" style=\"--n:"+n+"\" aria-label=\"Walkthrough diagram\"><div class=\"actors\">"+actors+"</div><div class=\"body\">"+lines+rows+"</div></div>";
+}
+function showStep(i){
+  var it=BY[openId]; if(!it) return;
+  cur=Math.max(0,Math.min(it.steps.length-1,i));
+  $$("#dlg .step").forEach(function(el){
+    var idx=+el.dataset.i;
+    el.classList.toggle("on",idx<=cur);
+    el.classList.toggle("cur",idx===cur);
+  });
+  var s=it.steps[cur];
+  $("#capH").textContent="Step "+(cur+1)+" of "+it.steps.length+": "+s[2];
+  $("#capP").textContent=s[3];
+  $("#prev").disabled=cur===0;
+  $("#next").disabled=cur===it.steps.length-1;
+  var last=cur===it.steps.length-1;
+  $("#play").textContent=timer?"Pause":(last?"Replay":"Play");
+}
+function play(){
+  var it=BY[openId];
+  if(timer){stopTimer();showStep(cur);return;}
+  if(cur>=it.steps.length-1) showStep(0);
+  timer=setInterval(function(){
+    if(cur>=it.steps.length-1){stopTimer();showStep(cur);return;}
+    showStep(cur+1);
+  },2600);
+  showStep(cur);
+}
+function selectTab(name,focus){
+  $$("#dlg .tab").forEach(function(t){
+    var on=t.dataset.tab===name;
+    t.setAttribute("aria-selected",String(on)); t.tabIndex=on?0:-1;
+    if(on&&focus) t.focus();
+  });
+  $$("#dlg .panel").forEach(function(p){p.hidden=p.dataset.panel!==name;});
+  if(name==="walk"){
+    showStep(0);
+    if(!reduce) setTimeout(function(){ if(openId&&!$("#dlg .panel[data-panel=walk]").hidden&&!timer) play(); },500);
+  } else { stopTimer(); }
+}
+function openItem(id,fromHash){
+  var it=BY[id]; if(!it) return;
+  stopTimer(); openId=id; cur=0;
+  var atk=it.kind==="attack";
+  var tabs=[["overview","Overview"],["walk","Walkthrough"],["act",atk?"How to defend":"Running it well"],["sig",atk?"How to detect":"Limits"]];
+  var rel=it.related.map(function(r){var o=BY[r];return "<button type=\"button\" class=\"chip "+o.kind+"\" data-open=\""+o.id+"\">"+esc(o.name)+"</button>";}).join("");
+  var h="<div class=\"d-head "+it.kind+"\"><div><div class=\"kind\"><b>"+(atk?"Attack":"Defense")+"</b><span>"+esc(CATS[it.cat])+"</span></div><h2 id=\"dTitle\">"+esc(it.name)+"</h2></div><button class=\"x\" type=\"button\" aria-label=\"Close\" data-close=\"dlg\">&times;</button></div>"+
+  "<div class=\"tabs\" role=\"tablist\">"+tabs.map(function(t,i){return "<button type=\"button\" role=\"tab\" class=\"tab\" id=\"tab-"+t[0]+"\" data-tab=\""+t[0]+"\" aria-controls=\"pan-"+t[0]+"\" aria-selected=\""+(i===0)+"\" tabindex=\""+(i===0?0:-1)+"\">"+t[1]+"</button>";}).join("")+"</div>"+
+  "<div class=\"panels "+it.kind+"\">"+
+  "<div class=\"panel\" role=\"tabpanel\" id=\"pan-overview\" aria-labelledby=\"tab-overview\" data-panel=\"overview\"><p class=\"lead\">"+esc(it.overview)+"</p><h3 class=\"h3\">Key characteristics</h3><ul class=\"list\">"+it.traits.map(function(t){return "<li>"+esc(t)+"</li>";}).join("")+"</ul>"+
+    "<dl class=\"meta\"><div><dt>"+(atk?"Targets":"Protects")+"</dt><dd>"+esc(ciaWords(it.cia))+"</dd></div><div><dt>Category</dt><dd>"+esc(CATS[it.cat])+"</dd></div>"+(it.ref?"<div><dt>Reference</dt><dd>"+esc(it.ref)+"</dd></div>":"")+"</dl></div>"+
+  "<div class=\"panel\" role=\"tabpanel\" id=\"pan-walk\" aria-labelledby=\"tab-walk\" data-panel=\"walk\" hidden>"+seqHTML(it)+
+    "<div class=\"cap\" aria-live=\"polite\"><h3 id=\"capH\"></h3><p id=\"capP\"></p></div>"+
+    "<div class=\"ctl\"><button class=\"btn alt\" id=\"prev\" type=\"button\">Back</button><button class=\"btn\" id=\"play\" type=\"button\">Play</button><button class=\"btn alt\" id=\"next\" type=\"button\">Next step</button></div>"+
+    "<p class=\"ref-note\">Simplified for learning. Real incidents have more steps and more variation.</p></div>"+
+  "<div class=\"panel\" role=\"tabpanel\" id=\"pan-act\" aria-labelledby=\"tab-act\" data-panel=\"act\" hidden><ul class=\"list\">"+it.actions.map(function(t){return "<li>"+esc(t)+"</li>";}).join("")+"</ul><h3 class=\"h3\">"+(atk?"Defenses that help":"Attacks it addresses")+"</h3><div class=\"chips\">"+rel+"</div></div>"+
+  "<div class=\"panel\" role=\"tabpanel\" id=\"pan-sig\" aria-labelledby=\"tab-sig\" data-panel=\"sig\" hidden><ul class=\"list\">"+it.signals.map(function(t){return "<li>"+esc(t)+"</li>";}).join("")+"</ul></div>"+
+  "</div>";
+  var d=$("#dlg"); d.innerHTML=h;
+  if(!d.open) d.showModal();
+  d.querySelector(".panels").scrollTop=0;
+  if(!fromHash && location.hash!=="#"+id){ try{ location.hash=id; }catch(e){} }
+}
+function closeDlg(name){
+  var d=$("#"+name); if(d&&d.open) d.close();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-open],[data-cmp],[data-close],.tab,.seg button,.cat,#play,#prev,#next");
+  if(!t){
+    if(e.target.tagName==="DIALOG") e.target.close();
+    return;
+  }
+  if(t.dataset.open){ openItem(t.dataset.open); return; }
+  if(t.dataset.cmp){ toggleCmp(t.dataset.cmp); return; }
+  if(t.dataset.close){ closeDlg(t.dataset.close); return; }
+  if(t.classList.contains("tab")){ selectTab(t.dataset.tab); return; }
+  if(t.parentElement&&t.parentElement.classList.contains("seg")){ state.kind=t.dataset.kind; syncControls(); renderGrid(); return; }
+  if(t.classList.contains("cat")){ state.cat=+t.dataset.cat; syncControls(); renderGrid(); return; }
+  if(t.id==="play"){ play(); return; }
+  if(t.id==="prev"){ stopTimer(); showStep(cur-1); return; }
+  if(t.id==="next"){ stopTimer(); showStep(cur+1); return; }
+});
+document.addEventListener("keydown",function(e){
+  var t=e.target;
+  if(t.classList&&t.classList.contains("tab")&&(e.key==="ArrowRight"||e.key==="ArrowLeft")){
+    var tabs=$$("#dlg .tab"); var i=tabs.indexOf(t);
+    i=(i+(e.key==="ArrowRight"?1:tabs.length-1))%tabs.length;
+    selectTab(tabs[i].dataset.tab,true); e.preventDefault();
+  }
+});
+$("#dlg").addEventListener("close",function(){
+  stopTimer(); openId=null;
+  if(location.hash&&location.hash.length>1){ try{ location.hash=""; }catch(e){} }
+});
+$("#q").addEventListener("input",function(e){ state.q=e.target.value.trim(); renderGrid(); });
+$("#clear").onclick=function(){ state.cmp=[]; renderTray(); renderGrid(); };
+$("#go").onclick=openCompare;
+window.addEventListener("hashchange",function(){
+  var id=location.hash.slice(1);
+  if(BY[id]){ if(openId!==id) openItem(id,true); }
+  else if(!id&&$("#dlg").open){ $("#dlg").close(); }
+});
+
+/* ---------- practice: quiz + incident drills ---------- */
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function labShell(title,kindLabel,body){
+  return "<div class=\"d-head\"><div><div class=\"kind\"><b>"+kindLabel+"</b></div><h2 id=\"lTitle\">"+esc(title)+"</h2></div><button class=\"x\" type=\"button\" aria-label=\"Close\" data-close=\"lab\">&times;</button></div><div class=\"panels\">"+body+"</div>";
+}
+function showLab(html){var d=$("#lab");d.innerHTML=html;if(!d.open)d.showModal();var p=d.querySelector(".panels");if(p)p.scrollTop=0;}
+
+var Q=[],qi=0,qScore=0;
+function makeQuiz(){
+  var atk=ITEMS.filter(function(i){return i.kind==="attack";}),def=ITEMS.filter(function(i){return i.kind==="defense";}),qs=[];
+  atk.forEach(function(a){
+    var good=a.related.map(function(id){return BY[id];}).filter(function(o){return o.kind==="defense";});
+    if(good.length){
+      var c=pick(good);
+      var bad=shuffle(def.filter(function(d){return a.related.indexOf(d.id)<0&&d.related.indexOf(a.id)<0;})).slice(0,3);
+      qs.push({q:"Which defense is most relevant against "+a.name+"?",o:shuffle([c.name].concat(bad.map(function(b){return b.name;}))),a:c.name,w:c.name+": "+c.short});
+    }
+    var others=shuffle(atk.filter(function(x){return x.id!==a.id;})).slice(0,3);
+    var sig=pick(a.signals);
+    qs.push({q:"Which of these is a warning sign of "+a.name+"?",o:shuffle([sig].concat(others.map(function(x){return pick(x.signals);}))),a:sig,w:"Watch for this when you suspect "+a.name+"."});
+  });
+  ITEMS.filter(function(i){return i.cia.length===1;}).forEach(function(i){
+    qs.push({q:"Which part of the CIA triad does "+i.name+" mainly "+(i.kind==="attack"?"target":"protect")+"?",o:["Confidentiality","Integrity","Availability"],a:CIA_NAMES[i.cia],w:i.short});
+  });
+  return shuffle(qs).slice(0,8);
+}
+function quizRender(){
+  if(qi>=Q.length){
+    var pct=Math.round(qScore/Q.length*100);
+    showLab(labShell("Quiz results","Quiz","<div class=\"score\">"+qScore+" of "+Q.length+"</div><p class=\"lead\">"+(pct>=80?"Strong work. You know how these attacks and defenses fit together.":pct>=50?"Good start. Reopen the topics you missed and replay their walkthroughs.":"Keep going. Open a few cards, play the walkthroughs, then try again.")+"</p><div class=\"row\"><button class=\"btn\" type=\"button\" data-act=\"qagain\">Try new questions</button><button class=\"btn alt\" type=\"button\" data-close=\"lab\">Close</button></div>"));
+    return;
+  }
+  var q=Q[qi];
+  showLab(labShell("Test yourself","Quiz","<p class=\"prog\">Question "+(qi+1)+" of "+Q.length+"</p><h3 class=\"qh\">"+esc(q.q)+"</h3><div id=\"opts\">"+q.o.map(function(o,i){return "<button type=\"button\" class=\"opt\" data-act=\"qopt\" data-i=\""+i+"\">"+esc(o)+"</button>";}).join("")+"</div><div id=\"qfb\" aria-live=\"polite\"></div>"));
+}
+function startQuiz(){Q=makeQuiz();qi=0;qScore=0;quizRender();}
+
+var DRILLS=[
+{t:"Impossible-travel sign-in",s:"An executive’s account signs in from two countries within ten minutes.",
+ steps:[
+  {p:"Your SIEM alerts: the account signed in from your office city, then from another country 10 minutes later. What do you do first?",o:[
+    {t:"Ignore it. It is probably a VPN.",ok:0,fb:"Possible, but assuming it is harmless is how takeovers go unnoticed. Check first."},
+    {t:"Review sign-in details (device, IP, method) and revoke active sessions if unsure.",ok:1,fb:"Right. Verify quickly with evidence, and cutting sessions limits damage while you look."},
+    {t:"Wipe the executive’s laptop.",ok:0,fb:"Too drastic and it may not be the cause. Start with the account."}]},
+  {p:"The odd sign-in used an unknown device. You also see a new inbox rule forwarding mail to an outside address. Next?",o:[
+    {t:"Delete the rule and move on.",ok:0,fb:"Removing the rule is needed, but the attacker may still have access."},
+    {t:"Revoke sessions, remove the rule, reset credentials and MFA, and review sent mail and other activity.",ok:1,fb:"Correct. Contain access, remove persistence, then check what was exposed."},
+    {t:"Email the whole company about a breach right away.",ok:0,fb:"Communication matters, but it follows facts and should go through the incident process."}]},
+  {p:"The root cause looks like a phished password. How do you reduce the chance of a repeat?",o:[
+    {t:"Ask people to be more careful.",ok:0,fb:"Awareness helps, but it is not a control you can rely on alone."},
+    {t:"Enforce phishing-resistant MFA, conditional access and alerts on new inbox rules.",ok:1,fb:"Yes. Make the stolen password useless and detect the follow-up behavior."},
+    {t:"Disable email for executives.",ok:0,fb:"That stops the business, not the attacker."}]}]},
+{t:"Ransomware on a file server",s:"Users report files with a strange extension and a ransom note.",
+ steps:[
+  {p:"A file server shows encrypted files and a ransom note. First action?",o:[
+    {t:"Isolate the host from the network, leave it powered on and open an incident.",ok:1,fb:"Right. Stop the spread and preserve memory and evidence."},
+    {t:"Reboot it to see if it fixes itself.",ok:0,fb:"Rebooting can destroy evidence and sometimes triggers more encryption."},
+    {t:"Contact the attacker about paying.",ok:0,fb:"Payment is a later business decision, not a first response, and it guarantees nothing."}]},
+  {p:"Now you need the scope. What do you check?",o:[
+    {t:"Only that one server, since it is the only one reported.",ok:0,fb:"Attackers usually move laterally. Look wider."},
+    {t:"Other hosts for the same indicators, which accounts were used, and whether backups are intact.",ok:1,fb:"Correct. Scope, accounts and backup health decide your recovery plan."},
+    {t:"Delete the ransom note files.",ok:0,fb:"Keep them. They are evidence."}]},
+  {p:"Time to recover. What is the safest approach?",o:[
+    {t:"Restore immediately onto the same network.",ok:0,fb:"If the attacker is still present, they can encrypt it again."},
+    {t:"Remove the attacker’s access, reset credentials, then restore from a clean offline backup and monitor.",ok:1,fb:"Yes. Eradicate first, then recover from a known-good copy."},
+    {t:"Leave the data encrypted and start over.",ok:0,fb:"Unnecessary if good backups exist."}]}]},
+{t:"Suspicious web requests",s:"Your WAF shows quotes and UNION keywords in a search parameter, followed by server errors.",
+ steps:[
+  {p:"Logs show repeated requests with quotes and UNION in /search, then HTTP 500 errors. What is your first move?",o:[
+    {t:"Block the IP and consider it done.",ok:0,fb:"Blocking helps, but you must learn whether the attack worked."},
+    {t:"Check app and database logs and response sizes to see whether any payload succeeded, and rate-limit the source.",ok:1,fb:"Right. Confirm impact while limiting further attempts."},
+    {t:"Take the site offline permanently.",ok:0,fb:"Too disruptive without evidence of compromise."}]},
+  {p:"Responses were unusually large for some requests. What now?",o:[
+    {t:"Treat it as a likely data exposure: preserve logs, involve the response team and assess what data the query could reach.",ok:1,fb:"Correct. Large responses suggest data may have left."},
+    {t:"Wait for more alerts.",ok:0,fb:"Waiting extends the exposure."},
+    {t:"Add a WAF rule and close the ticket.",ok:0,fb:"A rule is a stopgap, not an investigation or a fix."}]},
+  {p:"What is the lasting fix?",o:[
+    {t:"Switch the query to parameterized statements, reduce database privileges, and keep the WAF as a second layer.",ok:1,fb:"Yes. Fix the code, limit blast radius, keep defense in depth."},
+    {t:"Hide the error messages only.",ok:0,fb:"Hiding errors does not remove the vulnerability."},
+    {t:"Rely on the WAF alone.",ok:0,fb:"WAFs can be bypassed. Secure the code."}]}]}
+];
+var dI=-1,dS=0,dScore=0;
+function drillList(){
+  dI=-1;
+  showLab(labShell("Incident drills","Practice","<p class=\"lead\">Make the call at each stage. You get feedback after every choice.</p>"+DRILLS.map(function(d,i){return "<button type=\"button\" class=\"scn\" data-act=\"drill\" data-i=\""+i+"\"><b>"+esc(d.t)+"</b><span>"+esc(d.s)+"</span></button>";}).join("")));
+}
+function drillRender(){
+  var d=DRILLS[dI];
+  if(dS>=d.steps.length){
+    showLab(labShell(d.t,"Practice","<div class=\"score\">"+dScore+" of "+d.steps.length+"</div><p class=\"lead\">"+(dScore===d.steps.length?"Clean response. Contain, verify, remove, recover, then prevent.":"Review the feedback above and run it again to try the other choices.")+"</p><div class=\"row\"><button class=\"btn\" type=\"button\" data-act=\"dagain\">Run again</button><button class=\"btn alt\" type=\"button\" data-act=\"dlist\">All drills</button></div>"));
+    return;
+  }
+  var st=d.steps[dS];
+  showLab(labShell(d.t,"Practice","<p class=\"prog\">Stage "+(dS+1)+" of "+d.steps.length+"</p><div class=\"alertbox\">"+esc(st.p)+"</div><div id=\"opts\">"+st.o.map(function(o,i){return "<button type=\"button\" class=\"opt\" data-act=\"dopt\" data-i=\""+i+"\">"+esc(o.t)+"</button>";}).join("")+"</div><div id=\"qfb\" aria-live=\"polite\"></div>"));
+}
+$("#bQuiz").onclick=startQuiz;
+$("#bDrill").onclick=drillList;
+$("#lab").addEventListener("click",function(e){
+  var t=e.target.closest("[data-act]"); if(!t) return;
+  var a=t.dataset.act,i=+t.dataset.i;
+  if(a==="qopt"){
+    var q=Q[qi],right=q.o[i]===q.a; if(right) qScore++;
+    $$("#opts .opt").forEach(function(b,k){b.disabled=true;if(q.o[k]===q.a)b.classList.add("right");else if(k===i)b.classList.add("wrong");});
+    $("#qfb").innerHTML="<div class=\"fb\"><b>"+(right?"Correct.":"Not quite.")+"</b> "+esc(q.w)+"</div><button class=\"btn\" type=\"button\" data-act=\"qnext\">"+(qi===Q.length-1?"See results":"Next question")+"</button>";
+    $("#qfb .btn").focus();
+  } else if(a==="qnext"){ qi++; quizRender(); }
+  else if(a==="qagain"){ startQuiz(); }
+  else if(a==="drill"){ dI=i;dS=0;dScore=0;drillRender(); }
+  else if(a==="dopt"){
+    var st=DRILLS[dI].steps[dS],c=st.o[i]; if(c.ok) dScore++;
+    $$("#opts .opt").forEach(function(b,k){b.disabled=true;if(st.o[k].ok)b.classList.add("right");else if(k===i)b.classList.add("wrong");});
+    $("#qfb").innerHTML="<div class=\"fb\"><b>"+(c.ok?"Good call.":"Not the best move.")+"</b> "+esc(c.fb)+"</div><button class=\"btn\" type=\"button\" data-act=\"dnext\">"+(dS===DRILLS[dI].steps.length-1?"See results":"Next stage")+"</button>";
+    $("#qfb .btn").focus();
+  } else if(a==="dnext"){ dS++; drillRender(); }
+  else if(a==="dagain"){ dS=0;dScore=0;drillRender(); }
+  else if(a==="dlist"){ drillList(); }
+});
+
+/* theme */
+(function(){
+  var root=document.documentElement;
+  try{ var s=localStorage.getItem("cse-theme"); if(s==="light"||s==="dark") root.setAttribute("data-theme",s); }catch(e){}
+  $("#theme").onclick=function(){
+    var isDark=root.getAttribute("data-theme")==="dark"||(!root.getAttribute("data-theme")&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var next=isDark?"light":"dark";
+    root.setAttribute("data-theme",next);
+    try{ localStorage.setItem("cse-theme",next); }catch(e){}
+  };
+})();
+
+renderCats(); syncControls(); renderGrid(); renderTray();
+if(BY[location.hash.slice(1)]) openItem(location.hash.slice(1),true);
+</script>
+</body>
+</html>
